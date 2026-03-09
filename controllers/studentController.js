@@ -113,17 +113,20 @@ exports.createStudent = async function (request, response) {
 
 exports.updateStudent = async function (request, response) {
   try {
-    const { error: errorId } =
-      commonValidation.idParamsSchema.validate(request.params);
+    const { error: errorId } = commonValidation.idParamsSchema.validate(
+      request.params,
+    );
 
     if (errorId) {
       return response.status(400).json({ message: errorId.message });
     }
 
-    const { error, value } =
-      studentSchema.studentUpdateSchema.validate(requests.body, {
+    const { error, value } = studentSchema.studentUpdateSchema.validate(
+      requests.body,
+      {
         abortEarly: false,
-      });
+      },
+    );
 
     if (error) {
       return response
@@ -146,8 +149,9 @@ exports.updateStudent = async function (request, response) {
 };
 exports.deleteStudent = async function (request, response) {
   try {
-    const { error: errorId } =
-      commonValidation.idParamsSchema.validate(request.params);
+    const { error: errorId } = commonValidation.idParamsSchema.validate(
+      request.params,
+    );
 
     if (errorId) {
       return response.status(400).json({ message: errorId.message });
@@ -158,9 +162,9 @@ exports.deleteStudent = async function (request, response) {
       return response.status(404).json({ message: "Student Is Not Found" });
     }
 
-    await student.destroy()
+    await student.destroy();
 
-    response.json({message : "Student Deleted Successfully"})
+    response.json({ message: "Student Deleted Successfully" });
   } catch (error) {
     return response.status(500).json({ message: "Internal Server Error" });
   }
