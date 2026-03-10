@@ -1,18 +1,17 @@
-
 const adminValidation = require("../validation/adminValidation");
 const { Admin } = require("../models/Admin");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-exports.register = async (req, res) => {
+exports.register = async (request, response) => {
   try {
     const { error, value } = adminValidation.adminRegister.validate(
-      req.body, // ✅ بدل request.body
+      request.body,
       { abortEarly: false },
     );
     if (error) {
-      return res // ✅ بدل response
+      return response
         .status(400)
         .json({ error: error.details.map((err) => err.message) });
     }
@@ -20,27 +19,26 @@ exports.register = async (req, res) => {
     const { name, email, password } = value;
     const existing = await Admin.findOne({ where: { email } });
     if (existing)
-      return res.status(400).json({ message: "Email already exists" });
+      return response.status(409).json({ message: "Email already exists" });
 
     const admin = await Admin.create({ name, email, password });
-    res.status(201).json({
+    response.status(201).json({
       message: "Admin registered",
       admin: { id: admin.id, email: admin.email },
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Internal Server Error" });
+    response.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-exports.login = async (req, res) => {
+exports.login = async (request, response) => {
   try {
-    const { error, value } = adminValidation.adminLogin.validate(
-      req.body, // ✅ بدل request.body
-      { abortEarly: false },
-    );
+    const { error, value } = adminValidation.adminLogin.validate(request.body, {
+      abortEarly: false,
+    });
     if (error) {
-      return res // ✅ بدل response
+      return response
         .status(400)
         .json({ error: error.details.map((err) => err.message) });
     }
@@ -52,7 +50,9 @@ exports.login = async (req, res) => {
 
     const match = await bcrypt.compare(password, admin.password);
     if (!match)
-      return res.status(400).json({ message: "Invalid email or password" });
+      return response
+        .status(400)
+        .json({ message: "Invalid email or password" });
 
     const token = jwt.sign(
       { id: admin.id, role: admin.role },
@@ -60,7 +60,7 @@ exports.login = async (req, res) => {
       { expiresIn: "1h" },
     );
 
-    res.json({ message: "Login successful", token });
+    response.json({ message: "Login successful", token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
@@ -69,7 +69,17 @@ exports.login = async (req, res) => {
 
 exports.profile = async (req, res) => {
   try {
-    res.json({ message: "Admin profile", admin: req.admin });
+    const admin = await Admin.findByPk(req.admin.id, {
+      attributes: {exclude : ["password"]},
+    });
+
+    if (!admin) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    res.json({
+      admin,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });

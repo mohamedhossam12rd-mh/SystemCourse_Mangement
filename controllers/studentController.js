@@ -134,7 +134,7 @@ exports.updateStudent = async function (request, response) {
         .json({ message: error.details.map((err) => err.message) });
     }
 
-    const student = await Student.findByPk(requests.params.id);
+    const student = await Student.findByPk(request.params.id);
 
     if (!student) {
       return response.status(404).json({ message: "Student Is Not Found" });
@@ -156,7 +156,7 @@ exports.deleteStudent = async function (request, response) {
     if (errorId) {
       return response.status(400).json({ message: errorId.message });
     }
-    const student = await Student.findByPk(requests.params.id);
+    const student = await Student.findByPk(request.params.id);
 
     if (!student) {
       return response.status(404).json({ message: "Student Is Not Found" });
