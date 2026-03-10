@@ -19,7 +19,7 @@ const PORT = process.env.PORT ?? 3000;
 // Middlewares
 app.use(express.json());
 app.use(cors({ origin: "*" }));
-
+const adminRoutes = require("./routes/adminRoutes")
 const studentRoutes = require("./routes/studentRoutes");
 const profileRoutes = require("./routes/profileRoutes")
 const courseRoutes = require("./routes/courseRoutes");
@@ -32,6 +32,7 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 // Routes
+app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/students", studentRoutes)
 app.use("/api/v1/profile", profileRoutes)
 app.use("/api/v1/courses", courseRoutes) 
