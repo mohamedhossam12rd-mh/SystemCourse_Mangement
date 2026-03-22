@@ -122,7 +122,7 @@ exports.updateStudent = async function (request, response) {
     }
 
     const { error, value } = studentSchema.studentUpdateSchema.validate(
-      requests.body,
+      request.body,
       {
         abortEarly: false,
       },
