@@ -22,7 +22,7 @@ const Enrollment = sequelize.define(
       defaultValue: "enrolled",
     },
     enrolledAt: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       defaultValue: DataTypes.NOW,
     },
   },
